@@ -5,16 +5,20 @@ $(document).ready(function() {
 	pageChange();
 
 	$('#menu.screen .menu .btn').click(function(e) {
-		showEvent($(this).attr('href').substr(1));
+		var href = $(this).attr('href');
+
+		if (href.startsWith('#')) {
+			showEvent(href.substr(1));
+		}
 	});
 
 	function showEvent(index) {
-		var event = EVENTS[index];
+		var btn = BUTTONS[index];
 
-		showMap(event.title, event.lat, event.lng);
+		showMap(btn.title, btn.lat, btn.lng);
 
-		$('#info.screen .count').html(event.count);
-		$('#info.screen .time').html(event.time);
+		$('#info.screen .count').html(btn.count);
+		$('#info.screen .time').html(btn.time);
 
 		$('#menu.screen').hide();
 		$('#info.screen').show();

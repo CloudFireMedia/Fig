@@ -14,14 +14,18 @@
 	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Antic:regular|Roboto:regular,300,500"/>
 
 	<script type="text/javascript">
-		var EVENTS = [];
-		{foreach from=$events key=index item=event}
-		EVENTS[{$index}] = {literal}{{/literal}
-			'count': '{$event.count}',
-			'time': '{$event.time}',
-			'place': '{$event.place}',
-			'lat': {$event.lat},
-			'lng': {$event.lng}
+		var BUTTONS = [];
+		{foreach from=$buttons key=index item=btn}
+		BUTTONS[{$index}] = {literal}{{/literal}
+		{if $btn.href neq ''}
+			'href': '{$btn.href}'
+		{else}
+			'count': {$btn.count},
+			'time': '{$btn.time}',
+			'place': '{$btn.place}',
+			'lat': {$btn.lat},
+			'lng': {$btn.lng}
+		{/if}
 		{literal}}{/literal};
 		{/foreach}
 	</script>
@@ -34,11 +38,15 @@
 					<img src="/img/logo_t.png"/>
 				</div>
 				<ul class="menu">
-					{foreach from=$events key=index item=button}
+				{foreach from=$buttons key=index item=btn}
 					<li>
-						<a class="btn" href="#{$index}">{$button.title}</a>
+					{if $btn.href neq ''}
+						<a class="btn" href="{$btn.href}">{$btn.title}</a>
+					{else}
+						<a class="btn" href="#{$index}">{$btn.title}</a>
+					{/if}
 					</li>
-					{/foreach}
+				{/foreach}
 				</ul>
 			</div>
 		</div>

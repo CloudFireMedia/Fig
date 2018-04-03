@@ -40,20 +40,21 @@ $result = curl_exec($ch);
 curl_close($ch);
 
 $data = json_decode($result);
-$events = array();
+$buttons = array();
 
 foreach ($data->feed->entry as $row) {
-	array_push($events, array(
+	array_push($buttons, array(
 		'title' => $row->{'gsx$title'}->{'$t'},
 		'count' => $row->{'gsx$count'}->{'$t'},
 		'time' => $row->{'gsx$time'}->{'$t'},
 		'place' => $row->{'gsx$place'}->{'$t'},
 		'lat' => $row->{'gsx$latitude'}->{'$t'},
-		'lng' => $row->{'gsx$longitude'}->{'$t'}
+		'lng' => $row->{'gsx$longitude'}->{'$t'},
+		'href' => $row->{'gsx$buttonspecialhref'}->{'$t'}
 	));
 }
 
-$smarty->assign('events', $events);
+$smarty->assign('buttons', $buttons);
 
 $smarty->display('index.tmpl');
 
