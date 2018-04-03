@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, minimum-scale=1.00, maximum-scale=1.00, initial-scale=1.00, user-scalable=no, target-densitydpi=device-dpi, shrink-to-fit=no, viewport-fit=cover"/>
+	<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>Fig</title>
+
+	<link rel="icon shortcut" type="image/png" href="/favicon.png"/>
+	<link rel="apple-touch-icon-precomposed" type="image/png" href="/favicon_apple.png"/>
+	
+	<link rel="stylesheet" type="text/css" href="/css/main.css"/>
+	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Antic:regular|Roboto:regular,300,500"/>
+
+	<script type="text/javascript">
+		var EVENTS = [];
+		{foreach from=$events key=index item=event}
+		EVENTS[{$index}] = {literal}{{/literal}
+			'count': '{$event.count}',
+			'time': '{$event.time}',
+			'place': '{$event.place}',
+			'lat': {$event.lat},
+			'lng': {$event.lng}
+		{literal}}{/literal};
+		{/foreach}
+	</script>
+</head>
+<body>
+	<div id="layout">
+		<div id="menu" class="screen">
+			<div class="wrapper">
+				<div class="logo">
+					<img src="/img/logo_t.png"/>
+				</div>
+				<ul class="menu">
+					{foreach from=$events key=index item=button}
+					<li>
+						<a class="btn" href="#{$index}">{$button.title}</a>
+					</li>
+					{/foreach}
+				</ul>
+			</div>
+		</div>
+		<div id="info" class="screen">
+			<div class="wrapper">
+				<div class="count">12</div>
+				<div class="note">People are getting together to discuss this topic. Join us!</div>
+				<div class="time">Today at 12:30pm</div>
+				<div id="map"></div>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLaZUH8a4A3iBtsgkLslF3NAuk-CvLkKI"></script>
+	<script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="/js/main.js"></script>
+</body>
+</html>

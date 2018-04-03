@@ -1,0 +1,165 @@
+@font-face
+{
+	font-family: 'Fontawesome';
+	src: local('Fontawesome'), local('Fontawesome'), url('/fonts/Fontawesome.woff') format('woff');
+}
+
+body,
+html
+{
+	background: #fff;
+	font-family: 'Roboto', sans-serif;
+	color: #383838;
+	font-size: 16px;
+	font-weight: 400;
+	line-height: 18px;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-smoothing: antialiased;
+	width: 100%;
+	min-width: 100%;
+	min-height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+ul, ol, li, dl, dt, dd, p,
+h1, h2, h3, h4, h5, h6,
+input, textarea,
+button
+{
+	margin: 0;
+	padding: 0;
+}
+
+li
+{
+	list-style: none;
+}
+
+input, textarea, button
+{
+	background: transparent;
+	color: #383838;
+	font-family: 'Roboto', sans-serif;
+	font-size: 16px;
+	font-weight: 400;
+	line-height: 20px;
+}
+
+a, input, textarea,
+button, img, iframe
+{
+	border: 0;
+}
+
+a > img
+{
+	display: block;
+}
+
+.screen
+{
+	overflow: hidden;
+	background: transparent repeat center center;
+	width: 100%;
+	min-width: 320px;
+	margin: 0 auto;
+}
+
+.screen > .wrapper
+{
+	display: block;
+	max-width: 980px;
+	margin: 0 auto;
+	padding: 20px 10px;
+}
+
+/* Menu */
+#menu.screen
+{
+	/*background: #eee;*/
+}
+
+#menu.screen .logo
+{
+	width: 118px;
+	height: 77px;
+	margin: 0 auto 25px;
+}
+
+#menu.screen .logo img
+{
+	width: 100%;
+}
+
+#menu.screen .menu
+{
+	width: 100%;
+	margin: -10px 0;
+}
+
+#menu.screen .menu li
+{
+	padding: 10px 10px;
+}
+
+#menu.screen .menu .btn
+{
+	display: block;
+	background: #1E90FF;
+	color: #fff;
+	font-size: 16px;
+	text-align: center;
+	text-decoration: none;
+	line-height: 20px;
+	box-shadow: 0 0 10px rgba(0,0,0, 0.25);
+	border-radius: 4px;
+	padding: 10px 20px;
+}
+
+/* Info */
+#info.screen
+{
+	display: none;
+}
+
+#info.screen .count
+{
+	background: #1E90FF;
+	color: #fff;
+	font-size: 64px;
+	font-weight: 600;
+	line-height: 90px;
+	text-align: center;
+	border-radius: 50%;
+	width: 90px;
+	height: 90px;
+	margin: 0 auto;
+}
+
+#info.screen .note
+{
+	color: #999;
+	font-size: 14px;
+	line-height: 20px;
+	text-align: center;
+	width: 250px;
+	margin: 15px auto;
+}
+
+#info.screen .time
+{
+	color: #222;
+	font-size: 38px;
+	font-weight: 600;
+	line-height: 42px;
+	text-align: center;
+}
+
+#info.screen #map
+{
+	border-top: 1px solid #ccc;
+	height: 500px;
+	margin: 25px -15px 0;
+}
