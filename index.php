@@ -41,8 +41,13 @@ curl_close($ch);
 
 $data = json_decode($result);
 $buttons = array();
+$username = '';
 
 foreach ($data->feed->entry as $row) {
+	if (empty($username)) {
+		$username = $row->{'gsx$username'}->{'$t'};
+	}
+
 	array_push($buttons, array(
 		'title' => $row->{'gsx$title'}->{'$t'},
 		'count' => $row->{'gsx$count'}->{'$t'},
@@ -54,6 +59,7 @@ foreach ($data->feed->entry as $row) {
 	));
 }
 
+$smarty->assign('username', $username);
 $smarty->assign('buttons', $buttons);
 
 $smarty->display('index.tmpl');

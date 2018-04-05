@@ -11,7 +11,7 @@
 	<link rel="apple-touch-icon-precomposed" type="image/png" href="/favicon_apple.png"/>
 	
 	<link rel="stylesheet" type="text/css" href="/css/main.css"/>
-	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Antic:regular|Roboto:regular,300,500"/>
+	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:regular,300,400,600"/>
 
 	<script type="text/javascript">
 		var BUTTONS = [];
@@ -31,19 +31,79 @@
 	</script>
 </head>
 <body>
-	<div id="layout">
-		<div id="menu" class="screen">
+	<div id="menu">
+		<div class="wrapper">
+			<ul class="list">
+				<li class="active">
+					<a id="events" href="#">
+						<span class="icon clipboard"></span>
+						All Upcoming Events
+					</a>
+					<ul class="sub-menu">
+						<li>
+							<a class="underconstruction" href="#">Loneliness</a>
+						</li>
+						<li>
+							<a class="underconstruction" href="#">Vocation</a>
+						</li>
+						<li>
+							<a class="underconstruction" href="#">Politics</a>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<a class="underconstruction" href="#">
+						<span class="icon clock"></span>
+						My Scheduled Events
+					</a>
+				</li>
+				<li>
+					<a class="underconstruction" href="#">
+						<span class="icon star"></span>
+						My Starred Events
+					</a>
+				</li>
+				<li>
+					<a class="underconstruction" href="#">
+						<span class="icon check"></span>
+						My Past Events
+					</a>
+				</li>
+				<li>
+					<a class="underconstruction" href="#">
+						<span class="icon trash"></span>
+						My Deleted Interests
+					</a>
+				</li>
+			</ul>
+			<div class="footer">
+				<div class="inner">
+					<div class="user">
+						<div class="user-pic">
+							<img src="/img/user_pic.png"/>
+						</div>
+						<div class="user-name">{$username}</div>
+					</div>
+					<a class="settings-btn" href="#"></a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="blind"></div>
+	<div id="screens">
+		<a id="menu-btn" href="#"></a>
+		<div id="main" class="screen">
 			<div class="wrapper">
 				<div class="logo">
 					<img src="/img/logo_t.png"/>
 				</div>
-				<ul class="menu">
+				<ul class="buttons">
 				{foreach from=$buttons key=index item=btn}
 					<li>
 					{if $btn.href neq ''}
-						<a class="btn" href="{$btn.href}">{$btn.title}</a>
+						<a href="{$btn.href}">{$btn.title}</a>
 					{else}
-						<a class="btn" href="#{$index}">{$btn.title}</a>
+						<a href="#{$index}">{$btn.title}</a>
 					{/if}
 					</li>
 				{/foreach}
@@ -55,7 +115,30 @@
 				<div class="count">12</div>
 				<div class="note">People are getting together to discuss this topic. Join us!</div>
 				<div class="time">Today at 12:30pm</div>
+				<div class="buttons">
+					<div class="row c2">
+						<div class="col">
+							<a id="going" href="#" data-active="I'm going!" data-inactive="Going?">Going?</a>
+						</div>
+						<div class="col">
+							<a id="guests" href="#">Guest List</a>
+						</div>
+					</div>
+				</div>
+				<a id="map-link" href="#"></a>
 				<div id="map"></div>
+			</div>
+		</div>
+		<div id="underconstruction" class="screen">
+			<div class="wrapper">
+				<div class="logo">
+					<img src="/img/logo_t.png"/>
+				</div>
+				<div class="text">
+					<p>We're sorry!</p>
+					<p>This function is currently under development.</p>
+					<p>Please come back later!</p>
+				</div>
 			</div>
 		</div>
 	</div>

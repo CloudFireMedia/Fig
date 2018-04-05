@@ -1,7 +1,19 @@
 @font-face
 {
 	font-family: 'Fontawesome';
-	src: local('Fontawesome'), local('Fontawesome'), url('/fonts/Fontawesome.woff') format('woff');
+	src: local('Fontawesome'), local('Fontawesome'), url('/fonts/fa-brands-400.woff') format('woff');
+}
+
+@font-face
+{
+	font-family: 'Fontawesome';
+	src: local('Fontawesome'), local('Fontawesome'), url('/fonts/fa-regular-400.woff') format('woff');
+}
+
+@font-face
+{
+	font-family: 'Fontawesome';
+	src: local('Fontawesome'), local('Fontawesome'), url('/fonts/fa-solid-900.woff') format('woff');
 }
 
 body,
@@ -58,6 +70,54 @@ a > img
 	display: block;
 }
 
+.row
+{
+	display: table;
+	width: 100%;
+}
+
+.row > .col
+{
+	display: table-cell;
+	vertical-align: top;
+}
+
+.row.c2 > .col
+{
+	width: 50%;
+}
+
+#screens
+{
+	margin-left: 0;
+	position: relative;
+	transition: all 0.2s ease;
+}
+
+#screens.close
+{
+	margin-left: 260px;
+}
+
+#blind
+{
+	display: block;
+	opacity: 0;
+	background: #fff;
+	width: 100%;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	transition: all 0.2s ease;
+	z-index: 999995;
+}
+
+#blind.open
+{
+	opacity: 0.9;
+	z-index: 999997;
+}
+
 .screen
 {
 	overflow: hidden;
@@ -65,6 +125,8 @@ a > img
 	width: 100%;
 	min-width: 320px;
 	margin: 0 auto;
+	position: relative;
+	z-index: 999995;
 }
 
 .screen > .wrapper
@@ -75,36 +137,257 @@ a > img
 	padding: 20px 10px;
 }
 
-/* Menu */
-#menu.screen
+.icon
 {
-	/*background: #eee;*/
+	display: block;
+	width: 70px;
+	height: 70px;
+	position: relative;
 }
 
-#menu.screen .logo
+.icon:before
+{
+	display: block;
+	color: #fff;
+	font-family: 'Fontawesome';
+	font-size: 22px;
+	line-height: 70px;
+	text-align: center;
+	width: 70px;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+.icon.clipboard:before
+{
+	content: '\f328';
+	color: #38ecff;
+}
+
+.icon.clock:before
+{
+	content: '\f017';
+	color: #e2a961;
+}
+
+.icon.star:before
+{
+	content: '\f005';
+	color: #fce837;
+}
+
+.icon.check:before
+{
+	content: '\f058';
+	color: #91f7cf;
+}
+
+.icon.trash:before
+{
+	content: '\f2ed';
+	color: #f67f8a;
+}
+
+.screen
+{
+	display: none;
+}
+
+.screen .logo
 {
 	width: 118px;
 	height: 77px;
 	margin: 0 auto 25px;
 }
 
-#menu.screen .logo img
+.screen .logo img
 {
 	width: 100%;
 }
 
-#menu.screen .menu
+/* Menu */
+#menu
+{
+	overflow-x: hidden;
+	overflow-y: auto;
+	background: #1c2a47;
+	width: 260px;
+	position: fixed;
+	left: -260px;
+	top: 0;
+	bottom: 0;
+	transition: all 0.2s ease;
+	z-index: 999998;
+}
+
+#menu > .wrapper
+{
+	width: 100%;
+	min-height: 100%;
+	padding: 0 0 100px;
+	position: relative;
+}
+
+#menu.open
+{
+	left: 0;
+}
+
+#menu .list
+{
+	display: block;
+}
+
+#menu .list li
+{
+	border-bottom: 1px solid #253350;
+}
+
+#menu .list .icon
+{
+	float: left;
+}
+
+#menu .list > li a
+{
+	display: block;
+	color: #c3cbd3;
+	font-size: 16px;
+	line-height: 70px;
+	text-decoration: none;
+}
+
+#menu .list > li.active > a
+{
+	background: #3e5078;
+}
+
+#menu .sub-menu > li:last-child
+{
+	border: 0;
+}
+
+#menu .sub-menu > li > a
+{
+	font-weight: 300;
+	padding-left: 80px;
+}
+
+#menu .footer
+{
+	border-top: 1px solid #253350;
+	width: 100%;
+	height: 60px;
+	position: absolute;
+	bottom: 0;
+}
+
+#menu .footer > .inner
+{
+	padding: 10px 15px;
+	height: 60px;
+}
+
+#menu .footer .user
+{
+	float: left;
+	width: 170px;
+}
+
+#menu .footer .user .user-pic
+{
+	overflow: hidden;
+	float: left;
+	border-radius: 50%;
+	width: 60px;
+	height: 60px;
+}
+
+#menu .footer .user .user-pic img
+{
+	width: 100%;
+	height: auto;
+}
+
+#menu .footer .user .user-name
+{
+	display: block;
+	color: #c3cbd3;
+	font-size: 16px;
+	line-height: 60px;
+	text-decoration: none;
+	margin-left: 75px;
+}
+
+#menu .footer .settings-btn
+{
+	float: right;
+	display: block;
+	width: 60px;
+	height: 60px;
+	position: relative;
+}
+
+#menu .footer .settings-btn:before
+{
+	display: block;
+	content: '\f013';
+	color: #87a1b9;
+	font-family: 'Fontawesome';
+	font-size: 22px;
+	line-height: 60px;
+	text-align: center;
+	width: 60px;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+#menu-btn
+{
+	display: block;
+	width: 60px;
+	height: 60px;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+}
+
+#menu-btn:before
+{
+	display: block;
+	content: '\f0c9';
+	color: #1e90ff;
+	font-family: 'Fontawesome';
+	font-size: 22px;
+	line-height: 60px;
+	text-align: center;
+	width: 60px;
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 999996;
+}
+
+/* Main */
+#main.screen
+{
+	display: block;
+}
+
+#main.screen .buttons
 {
 	width: 100%;
 	margin: -10px 0;
 }
 
-#menu.screen .menu li
+#main.screen .buttons > li
 {
 	padding: 10px 10px;
 }
 
-#menu.screen .menu .btn
+#main.screen .buttons > li > a
 {
 	display: block;
 	background: #1E90FF;
@@ -121,7 +404,7 @@ a > img
 /* Info */
 #info.screen
 {
-	display: none;
+	/**/
 }
 
 #info.screen .count
@@ -155,11 +438,74 @@ a > img
 	font-weight: 600;
 	line-height: 42px;
 	text-align: center;
+	margin: 0 0 20px;
+}
+
+#info.screen .buttons
+{
+	/**/
+}
+
+#info.screen .buttons .row
+{
+	/**/
+}
+
+#info.screen .buttons .col
+{
+	padding: 0 10px;
+}
+
+#info.screen .buttons a
+{
+	display: block;
+	background: #fff;
+	color: #1E90FF;
+	font-size: 16px;
+	text-align: center;
+	text-decoration: none;
+	line-height: 16px;
+	border: 2px solid #1E90FF;
+	box-shadow: 0 0 10px rgba(0,0,0, 0.25);
+	border-radius: 4px;
+	padding: 10px 20px;
+}
+
+#info.screen .buttons a.active
+{
+	background: #1E90FF;
+	color: #fff;
+}
+
+#info.screen #map-link
+{
+	display: block;
+	height: 320px;
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 999994;
 }
 
 #info.screen #map
 {
 	border-top: 1px solid #ccc;
-	height: 500px;
-	margin: 25px -15px 0;
+	height: 320px;
+	margin: 25px -15px -20px;
+}
+
+/* Underconstruction */
+#underconstruction.screen .text
+{
+	padding: 50px 0 0;
+}
+
+#underconstruction.screen .text p
+{
+	color: #999;
+	font-size: 16px;
+	line-height: 20px;
+	text-align: center;
+	margin: 0 0 10px;
 }
