@@ -7,8 +7,8 @@
 
 	<title>Fig</title>
 
-	<link rel="icon shortcut" type="image/png" href="/favicon.png"/>
-	<link rel="apple-touch-icon-precomposed" type="image/png" href="/favicon_apple.png"/>
+	<link rel="icon shortcut" type="image/png" href="http://twilio-env.us-east-2.elasticbeanstalk.com/favicon.png"/>
+	<link rel="apple-touch-icon-precomposed" type="image/png" href="http://twilio-env.us-east-2.elasticbeanstalk.com/favicon_apple.png"/>
 	
 	<link rel="stylesheet" type="text/css" href="/css/main.css"/>
 	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:regular,300,400,600"/>
@@ -23,8 +23,7 @@
 			'count': {$btn.count},
 			'time': '{$btn.time}',
 			'place': '{$btn.place}',
-			'lat': {$btn.lat},
-			'lng': {$btn.lng}
+			'location': '{$btn.location}',
 		{/if}
 		{literal}}{/literal};
 		{/foreach}
@@ -35,42 +34,38 @@
 		<div class="wrapper">
 			<ul class="list">
 				<li class="active">
-					<a id="events" href="#">
+					<a href="#" data-status="all">
 						<span class="icon clipboard"></span>
 						All Upcoming Events
 					</a>
-					<ul class="sub-menu">
+					<ul class="categories">
+						{foreach from=$categories key=category item=count}
 						<li>
-							<a class="underconstruction" href="#">Loneliness</a>
+							<a href="#" data-category="{$category}">{$category}</a>
 						</li>
-						<li>
-							<a class="underconstruction" href="#">Vocation</a>
-						</li>
-						<li>
-							<a class="underconstruction" href="#">Politics</a>
-						</li>
+						{/foreach}
 					</ul>
 				</li>
 				<li>
-					<a class="underconstruction" href="#">
+					<a href="#" data-status="scheduled">
 						<span class="icon clock"></span>
 						My Scheduled Events
 					</a>
 				</li>
 				<li>
-					<a class="underconstruction" href="#">
+					<a href="#" data-status="starred">
 						<span class="icon star"></span>
 						My Starred Events
 					</a>
 				</li>
 				<li>
-					<a class="underconstruction" href="#">
+					<a href="#" data-status="past">
 						<span class="icon check"></span>
 						My Past Events
 					</a>
 				</li>
 				<li>
-					<a class="underconstruction" href="#">
+					<a href="#" data-status="deleted">
 						<span class="icon trash"></span>
 						My Deleted Interests
 					</a>
@@ -101,9 +96,9 @@
 				{foreach from=$buttons key=index item=btn}
 					<li>
 					{if $btn.href neq ''}
-						<a href="{$btn.href}">{$btn.title}</a>
+						<a href="{$btn.href}" data-category="{$btn.category}" data-status="{$btn.status}">{$btn.title}</a>
 					{else}
-						<a href="#{$index}">{$btn.title}</a>
+						<a href="#{$index}" data-category="{$btn.category}" data-status="{$btn.status}">{$btn.title}</a>
 					{/if}
 					</li>
 				{/foreach}

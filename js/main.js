@@ -9,8 +9,18 @@ $(document).ready(function() {
 
 		toggleMenu();
 
-		$('#screens .screen').hide();
-		$('#main.screen').show();
+		if (!$('#screens').hasClass('close')) {
+			$('#screens .screen').hide();
+			$('#screens .screen').each(function() {
+				if ($(this).css('display') == 'none') {
+					$('#main.screen').show();
+				}
+			});
+		}
+	});
+
+	$('#blind').click(function(e) {
+		toggleMenu();
 	});
 
 	$('#menu .list .underconstruction').click(function(e) {
@@ -22,10 +32,50 @@ $(document).ready(function() {
 		$('#underconstruction.screen').show();
 	});
 
-	$('#menu .list #events').click(function(e) {
+	$('#menu .list .categories a').click(function(e) {
 		e.preventDefault();
 
+		var category = $(this).data('category');
+
+		$('#main.screen .buttons > li > a').each(function() {
+			var btnEl = $(this);
+
+			btnEl.parent('li').hide();
+
+			if (btnEl.data('category') == category) {
+				btnEl.parent('li').show();
+			}
+		});
+
 		toggleMenu();
+
+		$('#screens .screen').hide();
+		$('#main.screen').show();
+	});
+
+	$('#menu .list > li > a').click(function(e) {
+		e.preventDefault();
+
+		var status = $(this).data('status');
+
+		if (status == 'all') {
+			$('#main.screen .buttons > li > a').parent('li').show();
+		} else {
+			$('#main.screen .buttons > li > a').each(function() {
+				var btnEl = $(this);
+
+				btnEl.parent('li').hide();
+
+				if (btnEl.data('status') == status) {
+					btnEl.parent('li').show();
+				}
+			});
+		}
+
+		toggleMenu();
+
+		$('#screens .screen').hide();
+		$('#main.screen').show();
 	});
 
 	$('#menu .footer .settings-btn').click(function(e) {
@@ -81,7 +131,7 @@ $(document).ready(function() {
 	function showEvent(index) {
 		var btn = BUTTONS[index];
 
-		showMap(btn.place, btn.lat, btn.lng);
+		showMap(btn.place, btn.location);
 
 		$('#info.screen .count').html(btn.count);
 		$('#info.screen .time').html(btn.time);
@@ -90,24 +140,27 @@ $(document).ready(function() {
 		$('#info.screen').show();
 	}
 
-	function showMap(place, lat, lng) {
-		var pos = {
-				lat: lat,
-				lng: lng
-			},
+	function showMap(place, location) {
+		var geocoder = new google.maps.Geocoder(),
 			map = new google.maps.Map($('#map').get(0), {
 				zoom: 17,
-				center: pos,
-				disableDefaultUI: true/*,
-				styles: GMAP_STYLE*/
+				disableDefaultUI: true//,
+				//styles: GMAP_STYLE
 			}),
-			marker = new google.maps.Marker({
-				position: pos,
-				title: place,
-				//icon: '/img/balloon.png',
-				map: map
-			}),
-			url = 'https://www.google.com/maps/place/'+place+'/@'+lat+','+lng+',17z';
+			address = place+' '+location,
+			url = 'https://www.google.com/maps/?q='+address;
+
+		geocoder.geocode({'address': address}, function(results, status) {
+			if (status === 'OK') {
+				var pos = results[0].geometry.location,
+					marker = new google.maps.Marker({
+						position: pos,
+						map: map
+					});
+				
+				map.setCenter(pos);
+			}
+		});
 
 		$('#info.screen #map-link').attr('href', url);
 	}

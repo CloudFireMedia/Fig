@@ -41,26 +41,46 @@ curl_close($ch);
 
 $data = json_decode($result);
 $buttons = array();
+$categories = array();
 $username = '';
 
 foreach ($data->feed->entry as $row) {
 	if (empty($username)) {
-		$username = $row->{'gsx$username'}->{'$t'};
+		$username = $row->{'gsx$name'}->{'$t'};
+	}
+
+	$category = trim(strtolower($row->{'gsx$category'}->{'$t'}));
+	$row_count = empty($row->{'gsx$count'}->{'$t'}) ? 0 : (int)$row->{'gsx$count'}->{'$t'};
+
+	if (!empty($category)) {
+		if (isset($categories[$category])) {
+			$categories[$category] = $categories[$category] + $row_count;
+		} else {
+			$categories = array_merge($categories, array($category => $row_count));
+		}
 	}
 
 	array_push($buttons, array(
-		'title' => $row->{'gsx$title'}->{'$t'},
-		'count' => $row->{'gsx$count'}->{'$t'},
+		'title' => $row->{'gsx$allevents'}->{'$t'},
+		'category' => $category,
+		'status' => trim(strtolower($row->{'gsx$status'}->{'$t'})),
+		'count' => $row_count,
 		'time' => $row->{'gsx$time'}->{'$t'},
 		'place' => $row->{'gsx$place'}->{'$t'},
-		'lat' => $row->{'gsx$latitude'}->{'$t'},
-		'lng' => $row->{'gsx$longitude'}->{'$t'},
+		'location' => $row->{'gsx$location'}->{'$t'},
 		'href' => $row->{'gsx$buttonspecialhref'}->{'$t'}
 	));
 }
 
+usort($buttons, function($a, $b) {
+	return ($a['count'] < $b['count']);
+});
+arsort($categories);
+array_splice($categories, 3);
+
 $smarty->assign('username', $username);
 $smarty->assign('buttons', $buttons);
+$smarty->assign('categories', $categories);
 
 $smarty->display('index.tmpl');
 
