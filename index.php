@@ -52,29 +52,12 @@ foreach ($rows['values'] as $row) {
 	$e_time = new DateTime('1970-01-01 00:00:00+00:00');
 	$e_time->setTimestamp(intval($row[5]*60*60*24) + intval($g_time->format('U')));
 
-	if ($c_time >= $e_time) {
-		$status = 'past';
-		$values = array([
-			ucfirst($status)
-		]);
-
-		updateSpreadsheetsFields($gss, $spreadsheet_id, $row_id, $values);
-	}
-
-	if (empty($status)) {
-		$status = 'upcoming';
-		$values = array([
-			ucfirst($status)
-		]);
-
-		updateSpreadsheetsFields($gss, $spreadsheet_id, $row_id, $values);
-	}
-
 	$event = array(
 		'id' => $row[0],
 		'title' => $row[3],
 		'category' => $category,
 		'status' => $status,
+		'is_past' => false,
 		'follows' => $event_follows,
 		'fulldate' => $e_time,
 		'date' => $e_time->format('l, F d'),
@@ -82,44 +65,37 @@ foreach ($rows['values'] as $row) {
 		'address' => $row[6]
 	);
 
-	switch ($status) {
-		case 'scheduled':
-			array_push($events['scheduled']['events'], $event);
-			$events['scheduled']['count']++;
-			break;
-		case 'starred':
-			array_push($events['starred']['events'], $event);
-			$events['starred']['count']++;
-			break;
-		case 'past':
-			array_push($events['past']['events'], $event);
-			$events['past']['count']++;
-			break;
-		case 'upcoming':
-			if (isset($categories[$category])) {
-				$categories[$category]['follows'] += $event_follows;
-				$categories[$category]['count']++;
-			} else {
-				$categories = array_merge($categories, array($category => array(
-					'follows' => $event_follows,
-					'count' => 1
-				)));
-			}
+	if ($c_time >= $e_time) {
+		$event['is_past'] = true;
+		array_push($events['past']['events'], $event);
+		$events['past']['count']++;
+	} else {
+		if (isset($categories[$category])) {
+			$categories[$category]['follows'] += $event_follows;
+			$categories[$category]['count']++;
+		} else {
+			$categories = array_merge($categories, array($category => array(
+				'follows' => $event_follows,
+				'count' => 1
+			)));
+		}
 
-			array_push($events['upcoming']['events'], $event);
-			$events['upcoming']['count']++;
-			break;
+		array_push($events['upcoming']['events'], $event);
+		$events['upcoming']['count']++;
+
+		switch ($status) {
+			case 'scheduled':
+				array_push($events['scheduled']['events'], $event);
+				$events['scheduled']['count']++;
+				break;
+			case 'starred':
+				array_push($events['starred']['events'], $event);
+				$events['starred']['count']++;
+				break;
+		}
 	}
 
 	$row_id++;
-}
-
-function updateSpreadsheetsFields($gss, $spreadsheet_id, $row_id, $values) {
-	$range = 'Events!C'.$row_id.':C'.$row_id;
-	$options = array('valueInputOption' => 'RAW');
-	$body = new Google_Service_Sheets_ValueRange(['values' => $values]);
-
-	return $gss->spreadsheets_values->update($spreadsheet_id, $range, $body, $options);
 }
 
 foreach ($events as &$info) {

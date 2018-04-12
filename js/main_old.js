@@ -32,9 +32,7 @@ $(document).ready(function() {
 			id = $('#info.screen').data('eventId'),
 			eventEl = $('#main.screen .events > li > a[data-event-id="'+id+'"]'),
 			starredCountEl = $('#menu .list > li > a[data-status="starred"] .count'),
-			upcomingCountEl = $('#menu .list > li > a[data-status="upcoming"] .count'),
 			starredCount = parseInt(starredCountEl.html()),
-			upcomingCount = parseInt(upcomingCountEl.html()),
 			status = '';
 
 		btnEl.toggleClass('active');
@@ -42,14 +40,11 @@ $(document).ready(function() {
 		if (btnEl.hasClass('active')) {
 			status = 'starred';
 			starredCountEl.html(starredCount + 1);
-			upcomingCountEl.html(upcomingCount - 1);
 		} else {
-			status = 'upcoming';
 			starredCountEl.html(starredCount - 1);
-			upcomingCountEl.html(upcomingCount + 1);
 		}
 
-		eventEl.attr('class', status);
+		eventEl.data('status', status);
 
 		$.ajax({
 			dataType: 'json',
@@ -67,17 +62,93 @@ $(document).ready(function() {
 		});
 	});
 
+	$('#info.screen #follow').click(function(e) {
+		e.preventDefault();
+
+		if (!$('#info.screen').hasClass('past')) {
+			var btnEl = $(this),
+				id = $('#info.screen').data('eventId'),
+				eventEl = $('#main.screen .events > li > a[data-event-id="'+id+'"]'),
+				scheduledCountEl = $('#menu .list > li > a[data-status="scheduled"] .count'),
+				scheduledCount = parseInt(scheduledCountEl.html()),
+				followsCountEl = $('#info.screen .count'),
+				followsCount = parseInt(followsCountEl.html()),
+				status = '';
+
+			btnEl.toggleClass('active');
+
+			if (btnEl.hasClass('active')) {
+				status = 'scheduled';
+				followsCount++;
+				scheduledCountEl.html(scheduledCount + 1);
+				btnEl.html(btnEl.data('active'));
+			} else {
+				followsCount--;
+				scheduledCountEl.html(scheduledCount - 1);
+				btnEl.html(btnEl.data('inactive'));
+			}
+
+			eventEl.data('status', status);
+
+			$.ajax({
+				dataType: 'json',
+				url: '/event.php',
+				data: {
+					'action': 'set',
+					'id': $('#info.screen').data('eventId'),
+					'fields': {
+						'status': status,
+						'count': followsCount
+					}
+				},
+				success: function(results) {
+					console.log(results);
+				}
+			});
+
+			followsCountEl.html(followsCount);
+		}
+	});
+
 	$('#blind').click(function(e) {
 		toggleMenu();
 	});
 
-	$('#menu .list .underconstruction').click(function(e) {
+	$('#menu .list > li > a').click(function(e) {
 		e.preventDefault();
+
+		var btnEl = $(this),
+			status = btnEl.data('status');
+
+		$('#menu .list .categories a').removeClass('active');
+		$('#menu .list > li > a').removeClass('active');
+		btnEl.addClass('active');
+
+		$('#main.screen .events > li').hide();
+		$('#main.screen .events > li > a').each(function() {
+			var eventEl = $(this);
+
+			switch (status) {
+				case 'upcoming':
+				case 'past':
+					if (eventEl.hasClass(status)) {
+						eventEl.parent('li').show();
+					}
+					break;
+				case 'starred':
+				case 'scheduled':
+					if (eventEl.data('status') == status) {
+						eventEl.parent('li').show();
+					}
+					break;
+			}
+			
+		});
 
 		toggleMenu();
 
 		$('#screens .screen').hide();
-		$('#underconstruction.screen').show();
+		$('#main.screen').show();
 	});
 
 	$('#menu .list .categories a').click(function(e) {
@@ -106,6 +177,15 @@ $(document).ready(function() {
 		$('#main.screen').show();
 	});
 
+	$('#menu .list .underconstruction').click(function(e) {
+		e.preventDefault();
+
+		toggleMenu();
+
+		$('#screens .screen').hide();
+		$('#underconstruction.screen').show();
+	});
+
 	$('#menu .footer .user').click(function(e) {
 		e.preventDefault();
 
@@ -113,31 +193,6 @@ $(document).ready(function() {
 
 		$('#screens .screen').hide();
 		$('#user.screen').show();
-	});
-
-	$('#menu .list > li > a').click(function(e) {
-		e.preventDefault();
-
-		var btnEl = $(this),
-			status = btnEl.data('status');
-
-		$('#menu .list .categories a').removeClass('active');
-		$('#menu .list > li > a').removeClass('active');
-		btnEl.addClass('active');
-
-		$('#main.screen .events > li').hide();
-		$('#main.screen .events > li > a').each(function() {
-			var eventEl = $(this);
-
-			if (eventEl.hasClass(status)) {
-				eventEl.parent('li').show();
-			}
-		});
-
-		toggleMenu();
-
-		$('#screens .screen').hide();
-		$('#main.screen').show();
 	});
 
 	$('#menu .footer .settings-btn').click(function(e) {
@@ -155,59 +210,6 @@ $(document).ready(function() {
 		/*var btnEl = $(this);
 
 		btnEl.toggleClass('active');*/
-	});
-
-	$('#info.screen #follow').click(function(e) {
-		e.preventDefault();
-
-		if (!$('#info.screen').hasClass('past')) {
-			var btnEl = $(this),
-				id = $('#info.screen').data('eventId'),
-				eventEl = $('#main.screen .events > li > a[data-event-id="'+id+'"]'),
-				scheduledCountEl = $('#menu .list > li > a[data-status="scheduled"] .count'),
-				upcomingCountEl = $('#menu .list > li > a[data-status="upcoming"] .count'),
-				scheduledCount = parseInt(scheduledCountEl.html()),
-				upcomingCount = parseInt(upcomingCountEl.html()),
-				followsCountEl = $('#info.screen .count'),
-				followsCount = parseInt(followsCountEl.html()),
-				status = '';
-
-			btnEl.toggleClass('active');
-
-			if (btnEl.hasClass('active')) {
-				status = 'scheduled';
-				followsCount++;
-				scheduledCountEl.html(scheduledCount + 1);
-				upcomingCountEl.html(upcomingCount - 1);
-				btnEl.html(btnEl.data('active'));
-			} else {
-				status = 'upcoming'
-				followsCount--;
-				scheduledCountEl.html(scheduledCount - 1);
-				upcomingCountEl.html(upcomingCount + 1);
-				btnEl.html(btnEl.data('inactive'));
-			}
-
-			eventEl.attr('class', status);
-
-			$.ajax({
-				dataType: 'json',
-				url: '/event.php',
-				data: {
-					'action': 'set',
-					'id': $('#info.screen').data('eventId'),
-					'fields': {
-						'status': status,
-						'count': followsCount
-					}
-				},
-				success: function(results) {
-					console.log(results);
-				}
-			});
-
-			followsCountEl.html(followsCount);
-		}
 	});
 
 	$('#main.screen .buttons > li > a').click(function(e) {
@@ -256,7 +258,7 @@ $(document).ready(function() {
 					followBtnEl.removeClass('active');
 				}
 
-				if (event.status == 'past') {
+				if (event.is_past) {
 					$('#info.screen').addClass('past');
 				} else {
 					$('#info.screen').removeClass('past');

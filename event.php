@@ -20,18 +20,20 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
 
 			foreach ($rows['values'] as $row) {
 				if ($row[0] == $_GET['id']) {
-					$status = trim(strtolower($row[2]));
-					$category = trim(strtolower($row[9]));
-					$event_follows = empty($row[4]) ? 0 : (int)$row[4];
-
 					$e_time = new DateTime('1970-01-01 00:00:00+00:00');
 					$e_time->setTimestamp(intval($row[5]*60*60*24) + intval($g_time->format('U')));
+
+					$status = trim(strtolower($row[2]));
+					$is_past = ($c_time >= $e_time);
+					$category = trim(strtolower($row[9]));
+					$event_follows = empty($row[4]) ? 0 : (int)$row[4];
 
 					$event = array(
 						'id' => $row[0],
 						'title' => $row[3],
 						'category' => $category,
 						'status' => $status,
+						'is_past' => $is_past,
 						'follows' => $event_follows,
 						'fulldate' => $e_time,
 						'date' => $e_time->format('l, F d'),

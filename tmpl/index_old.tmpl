@@ -109,14 +109,9 @@
 						<img src="/img/logo_t.png"/>
 					</div>
 					<ul class="events">
-					{foreach from=$events key=status item=info}
-					{foreach from=$info.events item=event}
-						{if $status eq 'upcoming'}
+					{foreach from=$events.upcoming.events item=event}
 						<li>
-						{else}
-						<li style="display: none;">
-						{/if}
-							<a class="{$event.status}" href="#{$event.id}" data-event-id="{$event.id}" data-category="{$event.category}">
+							<a class="upcoming" href="#{$event.id}" data-event-id="{$event.id}" data-status="{$event.status}" data-category="{$event.category}">
 								<div class="time">
 									<span class="icon clock"></span>
 									{$event.date}, {$event.time}
@@ -135,11 +130,32 @@
 							</a>
 						</li>
 					{/foreach}
+					{foreach from=$events.past.events item=event}
+						<li style="display: none;">
+							<a class="past" href="#{$event.id}" data-event-id="{$event.id}" data-status="{$event.status}" data-category="{$event.category}">
+								<div class="time">
+									<span class="icon clock"></span>
+									{$event.date}, {$event.time}
+								</div>
+								<div class="title">{$event.title}</div>
+								<ul class="info">
+									<li>
+										<span class="icon tags"></span>
+										{$event.category}
+									</li>
+									<li>
+										<span class="icon users"></span>
+										{$event.follows}
+									</li>
+								</ul>
+							</a>
+						</li>
 					{/foreach}
 					</ul>
 					<a class="write-us" href="sms:+16159727914;?&body=Hey%20Fig%21%20I%27m%20interested%20in%20...">
-						Interested in something else?<br/>
-						Ask Fig!
+						<div class="title">
+							Interested in something else? Ask Fig!
+						</div>
 					</a>
 				</div>
 			</div>
