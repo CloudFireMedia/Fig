@@ -19,6 +19,54 @@ $(document).ready(function() {
 		}
 	});
 
+	$('#filter-btn').click(function(e) {
+		e.preventDefault();
+
+		/**/
+	});
+
+	$('#star-btn').click(function(e) {
+		e.preventDefault();
+
+		var btnEl = $(this),
+			id = $('#info.screen').data('eventId'),
+			eventEl = $('#main.screen .events > li > a[data-event-id="'+id+'"]'),
+			starredCountEl = $('#menu .list > li > a[data-status="starred"] .count'),
+			upcomingCountEl = $('#menu .list > li > a[data-status="upcoming"] .count'),
+			starredCount = parseInt(starredCountEl.html()),
+			upcomingCount = parseInt(upcomingCountEl.html()),
+			status = '';
+
+		btnEl.toggleClass('active');
+
+		if (btnEl.hasClass('active')) {
+			status = 'starred';
+			starredCountEl.html(starredCount + 1);
+			upcomingCountEl.html(upcomingCount - 1);
+		} else {
+			status = 'upcoming';
+			starredCountEl.html(starredCount - 1);
+			upcomingCountEl.html(upcomingCount + 1);
+		}
+
+		eventEl.attr('class', status);
+
+		$.ajax({
+			dataType: 'json',
+			url: '/event.php',
+			data: {
+				'action': 'set',
+				'id': id,
+				'fields': {
+					'status': status
+				}
+			},
+			success: function(results) {
+				console.log(results);
+			}
+		});
+	});
+
 	$('#blind').click(function(e) {
 		toggleMenu();
 	});
@@ -35,9 +83,14 @@ $(document).ready(function() {
 	$('#menu .list .categories a').click(function(e) {
 		e.preventDefault();
 
-		var category = $(this).data('category');
+		var btnEl = $(this),
+			category = btnEl.data('category');
 
-		$('#main.screen .buttons > li > a').each(function() {
+		$('#menu .list .categories a').removeClass('active');
+		$('#menu .list > li > a').removeClass('active');
+		btnEl.addClass('active');
+
+		$('#main.screen .events > li > a.upcoming').each(function() {
 			var btnEl = $(this);
 
 			btnEl.parent('li').hide();
@@ -53,24 +106,33 @@ $(document).ready(function() {
 		$('#main.screen').show();
 	});
 
+	$('#menu .footer .user').click(function(e) {
+		e.preventDefault();
+
+		toggleMenu();
+
+		$('#screens .screen').hide();
+		$('#user.screen').show();
+	});
+
 	$('#menu .list > li > a').click(function(e) {
 		e.preventDefault();
 
-		var status = $(this).data('status');
+		var btnEl = $(this),
+			status = btnEl.data('status');
 
-		if (status == 'all') {
-			$('#main.screen .buttons > li > a').parent('li').show();
-		} else {
-			$('#main.screen .buttons > li > a').each(function() {
-				var btnEl = $(this);
+		$('#menu .list .categories a').removeClass('active');
+		$('#menu .list > li > a').removeClass('active');
+		btnEl.addClass('active');
 
-				btnEl.parent('li').hide();
+		$('#main.screen .events > li').hide();
+		$('#main.screen .events > li > a').each(function() {
+			var eventEl = $(this);
 
-				if (btnEl.data('status') == status) {
-					btnEl.parent('li').show();
-				}
-			});
-		}
+			if (eventEl.hasClass(status)) {
+				eventEl.parent('li').show();
+			}
+		});
 
 		toggleMenu();
 
@@ -87,31 +149,55 @@ $(document).ready(function() {
 		$('#underconstruction.screen').show();
 	});
 
-	$('#info.screen .buttons #going').click(function(e) {
+	$('#info.screen #follow').click(function(e) {
 		e.preventDefault();
 
 		var btnEl = $(this),
-			countEl = $('#info.screen .count'),
-			count = parseInt(countEl.html());
+			id = $('#info.screen').data('eventId'),
+			eventEl = $('#main.screen .events > li > a[data-event-id="'+id+'"]'),
+			scheduledCountEl = $('#menu .list > li > a[data-status="scheduled"] .count'),
+			upcomingCountEl = $('#menu .list > li > a[data-status="upcoming"] .count'),
+			scheduledCount = parseInt(scheduledCountEl.html()),
+			upcomingCount = parseInt(upcomingCountEl.html()),
+			followsCountEl = $('#info.screen .follows .count'),
+			followsCount = parseInt(followsCountEl.html()),
+			status = '';
 
 		btnEl.toggleClass('active');
 
 		if (btnEl.hasClass('active')) {
-			count++;
+			status = 'scheduled';
+			followsCount++;
+			scheduledCountEl.html(scheduledCount + 1);
+			upcomingCountEl.html(upcomingCount - 1);
 			btnEl.html(btnEl.data('active'));
 		} else {
-			count--;
+			status = 'upcoming'
+			followsCount--;
+			scheduledCountEl.html(scheduledCount - 1);
+			upcomingCountEl.html(upcomingCount + 1);
 			btnEl.html(btnEl.data('inactive'));
 		}
 
-		countEl.html(count);
-	});
+		eventEl.attr('class', status);
 
-	$('#info.screen .buttons #guests').click(function(e) {
-		e.preventDefault();
+		$.ajax({
+			dataType: 'json',
+			url: '/event.php',
+			data: {
+				'action': 'set',
+				'id': $('#info.screen').data('eventId'),
+				'fields': {
+					'status': status,
+					'count': followsCount
+				}
+			},
+			success: function(results) {
+				console.log(results);
+			}
+		});
 
-		$('#screens .screen').hide();
-		$('#underconstruction.screen').show();
+		followsCountEl.html(followsCount);
 	});
 
 	$('#main.screen .buttons > li > a').click(function(e) {
@@ -122,32 +208,64 @@ $(document).ready(function() {
 		}
 	});
 
+	$('#user.screen .interests > li > a').click(function(e) {
+		e.preventDefault();
+
+		$(this).toggleClass('active');
+	});
+
 	function toggleMenu() {
 		$('#menu').toggleClass('open');
 		$('#blind').toggleClass('open');
 		$('#screens').toggleClass('close');
 	}
 
-	function showEvent(index) {
-		var btn = BUTTONS[index];
+	function showEvent(id) {
+		$.ajax({
+			dataType: 'json',
+			url: '/event.php',
+			data: {
+				'action': 'get',
+				'id': id
+			},
+			success: function(event) {
+				showMap(event.address);
 
-		showMap(btn.place, btn.location);
+				var starBtnEl = $('#star-btn'),
+					followBtnEl = $('#info.screen #follow');
 
-		$('#info.screen .count').html(btn.count);
-		$('#info.screen .time').html(btn.time);
+				if (event.status == 'starred') {
+					starBtnEl.addClass('active');
+				} else {
+					starBtnEl.removeClass('active');
+				}
 
-		$('#screens .screen').hide();
-		$('#info.screen').show();
+				if (event.status == 'scheduled') {
+					followBtnEl.addClass('active');
+				} else {
+					followBtnEl.removeClass('active');
+				}
+
+				$('#info.screen').data('eventId', event.id);
+				$('#info.screen .brief .title').html(event.title);
+				$('#info.screen .count').html(event.follows);
+				$('#info.screen .date').html(event.date);
+				$('#info.screen .time').html(event.time);
+				$('#info.screen .category').html(event.category);
+
+				$('#screens .screen').hide();
+				$('#info.screen').show();
+			}
+		});
 	}
 
-	function showMap(place, location) {
+	function showMap(address) {
 		var geocoder = new google.maps.Geocoder(),
 			map = new google.maps.Map($('#map').get(0), {
 				zoom: 17,
 				disableDefaultUI: true//,
 				//styles: GMAP_STYLE
 			}),
-			address = place+' '+location,
 			url = 'https://www.google.com/maps/?q='+address;
 
 		geocoder.geocode({'address': address}, function(results, status) {

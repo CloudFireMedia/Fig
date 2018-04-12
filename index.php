@@ -1,87 +1,152 @@
 <?php
 
+require_once($_SERVER['DOCUMENT_ROOT'].'/google_client.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/libs/smarty/Smarty.class.php');
 
 $smarty = new Smarty();
 $smarty->template_dir = $_SERVER['DOCUMENT_ROOT'].'/tmpl/';
 $smarty->compile_dir = $_SERVER['DOCUMENT_ROOT'].'/tmpl/compiled/';
 
-/*
-$question = '** The topic of conversation and interest you expressed to Fig will appear here **';
+$g_time = new DateTime('1899-12-30 00:00:00+00:00');
+$u_time = new DateTime('1970-01-01 00:00:00+00:00');
 
-$mysqli = new mysqli("aaca260bqz22y3.coz9cd49podg.us-east-2.rds.amazonaws.com:3306", "twilio", "8ZthYm4L", "ebdb");
+$g_time->diff($u_time);
 
-if (mysqli_connect_errno()) {
-	printf("Подключение не удалось: %s\n", mysqli_connect_error());
-	exit();
-}
-
-$query = 'SELECT id, message FROM questions ORDER BY id DESC LIMIT 1';
-$result = $mysqli->query($query);
-if ($result) {
-	while ($row = $result->fetch_assoc()) {
-		$question = $row['message'];
-	}
-	$result->free();
-}
-$mysqli->close();
-*/
-
-$gdoc_key = '1FEjVqDZwES6G10GnmuhWntNF7Y45jqVZMHuthf4n36U';
-$gdoc_url = 'https://spreadsheets.google.com/feeds/list/'.$gdoc_key.'/1/public/values?alt=json';
-
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_URL, $gdoc_url);
-
-$result = curl_exec($ch);
-
-curl_close($ch);
-
-$data = json_decode($result);
-$buttons = array();
 $categories = array();
 $username = '';
+$events = array(
+	'upcoming' => array(
+		'events' => array(),
+		'count' => 0
+	),
+	'scheduled' => array(
+		'events' => array(),
+		'count' => 0
+	),
+	'starred' => array(
+		'events' => array(),
+		'count' => 0
+	),
+	'past' => array(
+		'events' => array(),
+		'count' => 0
+	)
+);
 
-foreach ($data->feed->entry as $row) {
+$gss = new Google_Service_Sheets($google_client);
+$spreadsheet_id = '1FEjVqDZwES6G10GnmuhWntNF7Y45jqVZMHuthf4n36U';
+
+$range = 'Events!A2:J';
+$options = array('valueRenderOption' => 'UNFORMATTED_VALUE');
+$rows = $gss->spreadsheets_values->get($spreadsheet_id, $range, $options);
+$row_id = 2;
+
+foreach ($rows['values'] as $row) {
 	if (empty($username)) {
-		$username = $row->{'gsx$name'}->{'$t'};
+		$username = $row[1];
+	}
+	
+	$category = trim(strtolower($row[9]));
+	$event_follows = empty($row[4]) ? 0 : (int)$row[4];
+	$status = trim(strtolower($row[2]));
+	$e_time = new DateTime('1970-01-01 00:00:00+00:00');
+	$e_time->setTimestamp(intval($row[5]*60*60*24) + intval($g_time->format('U')));
+
+	if ($c_time >= $e_time) {
+		$status = 'past';
+		$values = array([
+			ucfirst($status)
+		]);
+
+		updateSpreadsheetsFields($gss, $spreadsheet_id, $row_id, $values);
 	}
 
-	$category = trim(strtolower($row->{'gsx$category'}->{'$t'}));
-	$row_count = empty($row->{'gsx$count'}->{'$t'}) ? 0 : (int)$row->{'gsx$count'}->{'$t'};
+	if (empty($status)) {
+		$status = 'upcoming';
+		$values = array([
+			ucfirst($status)
+		]);
 
-	if (!empty($category)) {
-		if (isset($categories[$category])) {
-			$categories[$category] = $categories[$category] + $row_count;
-		} else {
-			$categories = array_merge($categories, array($category => $row_count));
-		}
+		updateSpreadsheetsFields($gss, $spreadsheet_id, $row_id, $values);
 	}
 
-	array_push($buttons, array(
-		'title' => $row->{'gsx$allevents'}->{'$t'},
+	$event = array(
+		'id' => $row[0],
+		'title' => $row[3],
 		'category' => $category,
-		'status' => trim(strtolower($row->{'gsx$status'}->{'$t'})),
-		'count' => $row_count,
-		'time' => $row->{'gsx$time'}->{'$t'},
-		'place' => $row->{'gsx$place'}->{'$t'},
-		'location' => $row->{'gsx$location'}->{'$t'},
-		'href' => $row->{'gsx$buttonspecialhref'}->{'$t'}
-	));
+		'status' => $status,
+		'follows' => $event_follows,
+		'fulldate' => $e_time,
+		'date' => $e_time->format('l, F d'),
+		'time' => $e_time->format('h:i A'),
+		'address' => $row[6]
+	);
+
+	switch ($status) {
+		case 'scheduled':
+			array_push($events['scheduled']['events'], $event);
+			$events['scheduled']['count']++;
+			break;
+		case 'starred':
+			array_push($events['starred']['events'], $event);
+			$events['starred']['count']++;
+			break;
+		case 'past':
+			array_push($events['past']['events'], $event);
+			$events['past']['count']++;
+			break;
+		case 'upcoming':
+			if (isset($categories[$category])) {
+				$categories[$category]['follows'] += $event_follows;
+				$categories[$category]['count']++;
+			} else {
+				$categories = array_merge($categories, array($category => array(
+					'follows' => $event_follows,
+					'count' => 1
+				)));
+			}
+
+			array_push($events['upcoming']['events'], $event);
+			$events['upcoming']['count']++;
+			break;
+	}
+
+	$row_id++;
 }
 
-usort($buttons, function($a, $b) {
-	return ($a['count'] < $b['count']);
+function updateSpreadsheetsFields($gss, $spreadsheet_id, $row_id, $values) {
+	$range = 'Events!C'.$row_id.':C'.$row_id;
+	$options = array('valueInputOption' => 'RAW');
+	$body = new Google_Service_Sheets_ValueRange(['values' => $values]);
+
+	return $gss->spreadsheets_values->update($spreadsheet_id, $range, $body, $options);
+}
+
+foreach ($events as &$info) {
+	uasort($info['events'], function($a, $b) {
+		return ($a['fulldate'] > $b['fulldate']);
+	});
+}
+
+uasort($categories, function($a, $b) {
+	return ($a['follows'] < $b['follows']);
 });
-arsort($categories);
 array_splice($categories, 3);
 
-$smarty->assign('username', $username);
-$smarty->assign('buttons', $buttons);
-$smarty->assign('categories', $categories);
+$range = 'Interests!A2:A';
+$options = array('valueRenderOption' => 'UNFORMATTED_VALUE');
+$rows = $gss->spreadsheets_values->get($spreadsheet_id, $range, $options);
+$interests = array();
 
-$smarty->display('index.tmpl');
+foreach ($rows['values'] as $row) {
+	array_push($interests, $row[0]);
+}
+
+$smarty->assign('username', $username);
+$smarty->assign('categories', $categories);
+$smarty->assign('events', $events);
+$smarty->assign('interests', $interests);
+
+$smarty->display('index_old.tmpl');
 
 ?>
