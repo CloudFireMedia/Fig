@@ -1,5 +1,8 @@
 <?php
 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require_once($_SERVER['DOCUMENT_ROOT'].'/google_client.php');
 
 if (isset($_GET['action']) && isset($_GET['id'])) {
@@ -23,21 +26,34 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
 					$e_time = new DateTime('1970-01-01 00:00:00+00:00');
 					$e_time->setTimestamp(intval($row[5]*60*60*24) + intval($g_time->format('U')));
 
-					$status = trim(strtolower($row[2]));
+					$status = trim(strtolower($row[3]));
 					$is_past = ($c_time >= $e_time);
-					$category = trim(strtolower($row[9]));
+					$category = trim(strtolower($row[2]));
 					$event_follows = empty($row[4]) ? 0 : (int)$row[4];
+
+					$c_time->setTime(0, 0, 0);
+					$date_diff = $c_time->diff($e_time);
+					$date_name = '';
+
+					switch ($date_diff->d) {
+						case 0:
+							$date_name = 'Today at';
+							break;
+						case 1:
+							$date_name = 'Tomorrow at';
+							break;
+					}
 
 					$event = array(
 						'id' => $row[0],
-						'title' => $row[3],
+						'title' => $row[1],
 						'category' => $category,
 						'status' => $status,
 						'is_past' => $is_past,
 						'follows' => $event_follows,
 						'fulldate' => $e_time,
-						'date' => $e_time->format('l, F d'),
-						'time' => $e_time->format('h:i A'),
+						'date' => ($date_name != '') ? $date_name : $e_time->format('l, F d'),
+						'time' => $e_time->format('h:ia'),
 						'address' => $row[6]
 					);
 
@@ -54,13 +70,13 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
 					'info' => ''
 				);
 				$fields = array(
-					'name' => 'B',
-					'status' => 'C',
-					'title' => 'D',
+					'name' => 'H',
+					'status' => 'D',
+					'title' => 'B',
 					'count' => 'E',
 					'time' => 'F',
 					'address' => 'G',
-					'category' => 'J'
+					'category' => 'C'
 				);
 				$row_id = 2;
 

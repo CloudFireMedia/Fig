@@ -13,7 +13,7 @@ $u_time = new DateTime('1970-01-01 00:00:00+00:00');
 $g_time->diff($u_time);
 
 $categories = array();
-$username = '';
+$username = 'Paul';
 $events = array(
 	'upcoming' => array(
 		'events' => array(),
@@ -42,19 +42,15 @@ $rows = $gss->spreadsheets_values->get($spreadsheet_id, $range, $options);
 $row_id = 2;
 
 foreach ($rows['values'] as $row) {
-	if (empty($username)) {
-		$username = $row[1];
-	}
-	
-	$category = trim(strtolower($row[9]));
+	$category = trim(strtolower($row[2]));
 	$event_follows = empty($row[4]) ? 0 : (int)$row[4];
-	$status = trim(strtolower($row[2]));
+	$status = trim(strtolower($row[3]));
 	$e_time = new DateTime('1970-01-01 00:00:00+00:00');
 	$e_time->setTimestamp(intval($row[5]*60*60*24) + intval($g_time->format('U')));
 
 	$event = array(
 		'id' => $row[0],
-		'title' => $row[3],
+		'title' => $row[1],
 		'category' => $category,
 		'status' => $status,
 		'is_past' => false,
