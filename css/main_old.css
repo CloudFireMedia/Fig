@@ -802,6 +802,17 @@ a > img
 }
 
 /* Interests */
+#user.screen .title
+{
+	color: #039be5;
+	font-size: 24px;
+	text-align: center;
+	font-weight: 600;
+	text-decoration: none;
+	line-height: 30px;
+	padding: 40px 0 25px;
+}
+
 #user.screen .interests
 {
 	display: flex;
