@@ -1,5 +1,15 @@
 $(document).ready(function() {
-	$('#menu-btn').click(function(e) {
+	if (isMobile.any) {
+		$('.layer').addClass('is-mobile');
+
+		$('#main.screen .write-us.mobile').addClass('active');
+		$('#main.screen .write-us.mobile').addClass('current');
+	} else {
+		$('#main.screen .write-us.desktop').addClass('active');
+		$('#main.screen .write-us.desktop').addClass('current');
+	}
+
+	$('#menu-btn').on('click', function(e) {
 		e.preventDefault();
 
 		toggleMenu();
@@ -14,13 +24,13 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#filter-btn').click(function(e) {
+	$('#filter-btn').on('click', function(e) {
 		e.preventDefault();
 
 		/**/
 	});
 
-	$('#star-btn').click(function(e) {
+	$('#star-btn').on('click', function(e) {
 		e.preventDefault();
 
 		var btnEl = $(this),
@@ -29,7 +39,7 @@ $(document).ready(function() {
 			eventEl = $('#main.screen .events > li > a[data-event-id="'+id+'"]'),
 			starredCountEl = $('#menu .list > li > a[data-status="starred"] .count'),
 			starredCount = parseInt(starredCountEl.html()),
-			status = '';
+			status = 'None';
 
 		if (followBtnEl.hasClass('active')) {
 			followBtnEl.trigger('click');
@@ -62,7 +72,7 @@ $(document).ready(function() {
 		});
 	});
 
-	$('#info.screen #follow').click(function(e) {
+	$('#info.screen #follow').on('click', function(e) {
 		e.preventDefault();
 
 		if (!$('#info.screen').hasClass('past')) {
@@ -74,7 +84,7 @@ $(document).ready(function() {
 				scheduledCount = parseInt(scheduledCountEl.html()),
 				followsCountEl = $('#info.screen .count'),
 				followsCount = parseInt(followsCountEl.html()),
-				status = '';
+				status = 'None';
 
 			if (starBtnEl.hasClass('active')) {
 				starBtnEl.trigger('click');
@@ -115,46 +125,35 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#blind').click(function(e) {
+	$('#blind').on('click', function(e) {
 		toggleMenu();
 	});
 
-	$('#menu .list > li > a').click(function(e) {
+	$('#menu .list > li > a').on('click', function(e) {
 		e.preventDefault();
 
 		var btnEl = $(this),
 			status = btnEl.data('status');
 
+		$.ajax({
+			dataType: 'json',
+			url: '/event.php',
+			data: {
+				'action': 'list',
+				'status': status
+			},
+			success: showEvents
+		});
+
 		$('#menu .list .categories a').removeClass('active');
 		$('#menu .list > li > a').removeClass('active');
 
 		btnEl.addClass('active');
 
-		$('#main.screen .write-us').removeClass('active');
+		$('#main.screen .write-us.current').removeClass('active');
 		if (status == 'upcoming') {
-			$('#main.screen .write-us').addClass('active');
+			$('#main.screen .write-us.current').addClass('active');
 		}
-
-		$('#main.screen .events > li').hide();
-		$('#main.screen .events > li > a').each(function() {
-			var eventEl = $(this);
-
-			switch (status) {
-				case 'upcoming':
-				case 'past':
-					if (eventEl.hasClass(status)) {
-						eventEl.parent('li').show();
-					}
-					break;
-				case 'starred':
-				case 'scheduled':
-					if (eventEl.data('status') == status) {
-						eventEl.parent('li').show();
-					}
-					break;
-			}
-			
-		});
 
 		toggleMenu();
 
@@ -162,27 +161,28 @@ $(document).ready(function() {
 		$('#main.screen').show();
 	});
 
-	$('#menu .list .categories a').click(function(e) {
+	$('#menu .list .categories a').on('click', function(e) {
 		e.preventDefault();
 
 		var btnEl = $(this),
 			category = btnEl.data('category');
 
+		$.ajax({
+			dataType: 'json',
+			url: '/event.php',
+			data: {
+				'action': 'list',
+				'category': category
+			},
+			success: showEvents
+		});
+
 		$('#menu .list .categories a').removeClass('active');
 		$('#menu .list > li > a').removeClass('active');
 
 		btnEl.addClass('active');
 
-		$('#main.screen .write-us').removeClass('active');
-
-		$('#main.screen .events > li').hide();
-		$('#main.screen .events > li > a.upcoming').each(function() {
-			var btnEl = $(this);
-
-			if (btnEl.data('category') == category) {
-				btnEl.parent('li').show();
-			}
-		});
+		$('#main.screen .write-us.current').removeClass('active');
 
 		toggleMenu();
 
@@ -190,7 +190,7 @@ $(document).ready(function() {
 		$('#main.screen').show();
 	});
 
-	$('#menu .list .underconstruction').click(function(e) {
+	$('#menu .list .underconstruction').on('click', function(e) {
 		e.preventDefault();
 
 		toggleMenu();
@@ -199,7 +199,7 @@ $(document).ready(function() {
 		$('#underconstruction.screen').show();
 	});
 
-	$('#menu .footer .user').click(function(e) {
+	$('#menu .footer .user').on('click', function(e) {
 		e.preventDefault();
 
 		toggleMenu();
@@ -208,7 +208,7 @@ $(document).ready(function() {
 		$('#user.screen').show();
 	});
 
-	$('#menu .footer .settings-btn').click(function(e) {
+	$('#menu .footer .settings-btn').on('click', function(e) {
 		e.preventDefault();
 
 		toggleMenu();
@@ -217,7 +217,7 @@ $(document).ready(function() {
 		$('#underconstruction.screen').show();
 	});
 
-	$('#info.screen #guests').click(function(e) {
+	$('#info.screen #guests').on('click', function(e) {
 		e.preventDefault();
 
 		/*var btnEl = $(this);
@@ -225,17 +225,15 @@ $(document).ready(function() {
 		btnEl.toggleClass('active');*/
 	});
 
-	$('#main.screen .events > li > a').click(function(e) {
+	$('#main.screen .events').on('click', '.event', function(e) {
 		e.preventDefault();
 
-		var href = $(this).attr('href');
+		var id = $(this).data('eventId');
 
-		if (href.startsWith('#')) {
-			showEvent(href.substr(1));
-		}
+		showEvent(id);
 	});
 
-	$('#user.screen .interests > li > a').click(function(e) {
+	$('#user.screen .interests a').on('click', function(e) {
 		e.preventDefault();
 
 		$(this).toggleClass('active');
@@ -292,6 +290,28 @@ $(document).ready(function() {
 				$('#info.screen').show();
 			}
 		});
+	}
+
+	function showEvents(events) {
+		$('#main.screen .events').empty();
+
+		$.each(events, function() {
+			var liEl = $('<li></li>').appendTo('#main.screen .events'),
+				linkEl = $('<a class="event '+ this.status +'" href="#" data-event-id="'+ this.id +'"></a>').appendTo(liEl);
+
+			$('<div class="time"><span class="icon clock"></span>'+ this.date +', '+ this.time +'</div>').appendTo(linkEl);
+			$('<div class="title">'+ this.title +'</div>').appendTo(linkEl);
+
+			var infoEl = $('<ul class="info"></ul>').appendTo(linkEl);
+			$('<li><span class="icon tags"></span>'+ this.category +'</li>').appendTo(infoEl);
+			$('<li><span class="icon users"></span>'+ this.follows +'</li>').appendTo(infoEl);
+		});
+
+		if (events.length > 0) {
+			$('#main.screen .empty').removeClass('active');
+		} else {
+			$('#main.screen .empty').addClass('active');
+		}
 	}
 
 	function showMap(address) {

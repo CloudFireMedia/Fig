@@ -5,7 +5,7 @@ ini_set('display_errors', 1);
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/google_client.php');
 
-if (isset($_GET['action']) && isset($_GET['id'])) {
+if (isset($_GET['action'])) {
 	$gss = new Google_Service_Sheets($google_client);
 	$spreadsheet_id = '1FEjVqDZwES6G10GnmuhWntNF7Y45jqVZMHuthf4n36U';
 	$range = 'Events!A2:J';
@@ -104,6 +104,63 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
 					$row_id++;
 				}
 			}
+			break;
+		case 'list':
+			$events = array();
+
+			foreach ($rows['values'] as $row) {
+				$status = trim(strtolower($row[3]));
+				$category = trim(strtolower($row[2]));
+				$event_follows = empty($row[4]) ? 0 : (int)$row[4];
+				$e_time = new DateTime('1970-01-01 00:00:00+00:00');
+				$e_time->setTimestamp(intval($row[5]*60*60*24) + intval($g_time->format('U')));
+
+				$event = array(
+					'id' => $row[0],
+					'title' => $row[1],
+					'category' => $category,
+					'status' => $status,
+					'follows' => $event_follows,
+					'fulldate' => $e_time,
+					'date' => $e_time->format('l, F d'),
+					'time' => $e_time->format('h:i A'),
+					'address' => $row[6]
+				);
+
+				if (isset($_GET['status'])) {
+					switch ($_GET['status']) {
+						case 'upcoming':
+							if ($c_time < $e_time) {
+								$event['status'] = 'upcoming';
+								array_push($events, $event);
+							}
+							break;
+						case 'past':
+							if ($c_time >= $e_time) {
+								$event['status'] = 'past';
+								array_push($events, $event);
+							}
+							break;
+						
+						default:
+							if (($status == $_GET['status']) && ($c_time < $e_time)) {
+								array_push($events, $event);
+							}
+							break;
+					}
+				} elseif (isset($_GET['category']) && ($category == $_GET['category'])) {
+					array_push($events, $event);
+				}
+			}
+
+			/*uasort($events, function($a, $b) {
+				return ($a['fulldate'] > $b['fulldate']);
+			});*/
+
+			header('Content-Type: application/json');
+			echo(json_encode($events));
+			exit;
+
 			break;
 	}
 }

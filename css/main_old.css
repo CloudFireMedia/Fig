@@ -1,22 +1,58 @@
 @font-face
 {
+	font-family: 'Avenir';
+	font-weight: 300;
+	font-style: normal;
+	src: url('/fonts/AvenirLTStd-Light.woff2') format('woff2'),
+		 url('/fonts/AvenirLTStd-Light.woff') format('woff'),
+		 url('/fonts/AvenirLTStd-Light.ttf') format('truetype'),
+		 url('/fonts/AvenirLTStd-Light.svg#AvenirLTStd-Light') format('svg'),
+		 url('/fonts/AvenirLTStd-Light.eot?#iefix') format('embedded-opentype');
+}
+
+@font-face
+{
+	font-family: 'Avenir';
+	font-weight: 400;
+	font-style: normal;
+	src: url('/fonts/AvenirLTStd-Medium.woff2') format('woff2'),
+		 url('/fonts/AvenirLTStd-Medium.woff') format('woff'),
+		 url('/fonts/AvenirLTStd-Medium.ttf') format('truetype'),
+		 url('/fonts/AvenirLTStd-Medium.svg#AvenirLTStd-Medium') format('svg'),
+		 url('/fonts/AvenirLTStd-Medium.eot?#iefix') format('embedded-opentype');
+}
+
+@font-face
+{
+	font-family: 'Avenir';
+	font-weight: 600;
+	font-style: normal;
+	src: url('/fonts/AvenirLTStd-Heavy.woff2') format('woff2'),
+		 url('/fonts/AvenirLTStd-Heavy.woff') format('woff'),
+		 url('/fonts/AvenirLTStd-Heavy.ttf') format('truetype'),
+		 url('/fonts/AvenirLTStd-Heavy.svg#AvenirLTStd-Heavy') format('svg'),
+		 url('/fonts/AvenirLTStd-Heavy.eot?#iefix') format('embedded-opentype');
+}
+
+@font-face
+{
 	font-family: 'Fontawesome';
 	font-weight: 400;
-	src: local('Fontawesome'), local('Fontawesome'), url('/fonts/fa-regular-400.woff') format('woff');
+	src: local('Fontawesome'), url('/fonts/fa-regular-400.woff') format('woff');
 }
 
 @font-face
 {
 	font-family: 'Fontawesome';
 	font-weight: 600;
-	src: local('Fontawesome'), local('Fontawesome'), url('/fonts/fa-solid-900.woff') format('woff');
+	src: local('Fontawesome'), url('/fonts/fa-solid-900.woff') format('woff');
 }
 
 body,
 html
 {
 	background: #fff;
-	font-family: 'Roboto', sans-serif;
+	font-family: 'Avenir', sans-serif;
 	color: #383838;
 	font-size: 16px;
 	font-weight: 400;
@@ -49,7 +85,7 @@ input, textarea, button
 {
 	background: transparent;
 	color: #383838;
-	font-family: 'Roboto', sans-serif;
+	font-family: 'Avenir', sans-serif;
 	font-size: 16px;
 	font-weight: 400;
 	line-height: 20px;
@@ -64,6 +100,7 @@ button, img, iframe
 a
 {
 	outline: none;
+	-webkit-tap-highlight-color: transparent;
 }
 
 a > img
@@ -91,9 +128,11 @@ a > img
 .layer
 {
 	overflow: hidden;
+	width: 800px;
+	margin-left: -400px;
 	position: absolute;
-	left: 0;
-	right: 0;
+	left: 50%;
+	right: auto;
 	top: 0;
 	bottom: 0;
 }
@@ -250,6 +289,11 @@ a > img
 	width: 100%;
 }
 
+.mobile
+{
+	display: none;
+}
+
 /* Menu */
 #menu
 {
@@ -320,6 +364,14 @@ a > img
 #menu .list > li > a.active
 {
 	background: rgba(255,255,255, 0.1);
+}
+
+#menu .categories
+{
+	overflow-x: hidden;
+	overflow-y: auto;
+	box-shadow: inset 0 0 15px rgba(0,0,0, 0.25);
+	height: 183px;
 }
 
 #menu .categories > li
@@ -491,6 +543,11 @@ a > img
 	position: relative;
 }
 
+#info.screen.past #star-btn
+{
+	display: none;
+}
+
 #star-btn:before
 {
 	display: block;
@@ -527,11 +584,10 @@ a > img
 
 #main.screen .events > li
 {
-	margin: 10px 0;
+	margin: 0 0 10px;
 	padding: 0 20px;
 }
 
-#main.screen .events > li:first-child,
 #main.screen .events > li:last-child
 {
 	margin: 0;
@@ -629,6 +685,17 @@ a > img
 	font-weight: 400;
 }
 
+#main.screen .empty
+{
+	display: none;
+	color: #999;
+	font-size: 16px;
+	line-height: 20px;
+	text-align: center;
+	margin: 50px 0 0;
+	padding: 0 20px;
+}
+
 #main.screen .write-us
 {
 	display: none;
@@ -638,6 +705,7 @@ a > img
 	margin: 10px 20px;
 }
 
+#main.screen .empty.active,
 #main.screen .write-us.active
 {
 	display: block;
@@ -760,9 +828,19 @@ a > img
 	padding: 0 10px;
 }
 
+#info.screen.past .fulldate
+{
+	color: #444;
+}
+
 #info.screen .buttons
 {
 	/**/
+}
+
+#info.screen.past .buttons
+{
+	display: none;
 }
 
 #info.screen .buttons .row
@@ -801,6 +879,12 @@ a > img
 	border-color: #999;
 }
 
+#info.screen.past .buttons a.active
+{
+	background: #999;
+	color: #fff;
+}
+
 /* Interests */
 #user.screen .title
 {
@@ -820,6 +904,7 @@ a > img
 	font-size: 0;
 	text-align: center;
 	margin: -5px 0 15px;
+	padding: 0 10px;
 }
 
 #user.screen .interests > li
@@ -836,6 +921,7 @@ a > img
 	font-size: 16px;
 	font-weight: 400;
 	text-align: center;
+	white-space: nowrap;
 	text-decoration: none;
 	line-height: 16px;
 	border: 2px solid #039be5;
@@ -856,6 +942,7 @@ a > img
 	margin: 50px 0 0;
 }
 
+
 #underconstruction.screen .text p
 {
 	color: #999;
@@ -863,4 +950,22 @@ a > img
 	line-height: 20px;
 	text-align: center;
 	margin: 0 0 5px;
+}
+
+.layer.is-mobile
+{
+	width: 100%;
+	margin: 0;
+	left: 0;
+	right: 0;
+}
+
+.layer.is-mobile .desctop
+{
+	display: none;
+}
+
+.layer.is-mobile .mobile
+{
+	display: block;
 }

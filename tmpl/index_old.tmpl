@@ -17,8 +17,8 @@
 	<meta property="og:image:width" content="510"/>
 	<meta property="og:image:height" content="320"/-->
 
-	<meta name="theme-color" content="#cccccc"/>
-	<meta name="msapplication-TileColor" content="#cccccc"/>
+	<meta name="theme-color" content="#4576BB"/>
+	<meta name="msapplication-TileColor" content="#4576BB"/>
 	<meta name="msapplication-TileImage" content="/mstile-144x144.png?v=NmYO8WoKWA"/>
 	<meta name="msapplication-config" content="/browserconfig.xml"/>
 
@@ -38,7 +38,6 @@
 	<link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" sizes="180x180"/>
 
 	<link rel="stylesheet" type="text/css" href="/css/main_old.css"/>
-	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:regular,300,400,600"/>
 </head>
 <body>
 	<div class="layer">
@@ -106,33 +105,12 @@
 						<a id="filter-btn" href="#"></a>
 					</div>
 					<div class="logo">
-						<img src="/img/logo_t.png"/>
+						<img src="/img/logo.png"/>
 					</div>
 					<ul class="events">
 					{foreach from=$events.upcoming.events item=event}
 						<li>
-							<a class="upcoming" href="#{$event.id}" data-event-id="{$event.id}" data-status="{$event.status}" data-category="{$event.category}">
-								<div class="time">
-									<span class="icon clock"></span>
-									{$event.date}, {$event.time}
-								</div>
-								<div class="title">{$event.title}</div>
-								<ul class="info">
-									<li>
-										<span class="icon tags"></span>
-										{$event.category}
-									</li>
-									<li>
-										<span class="icon users"></span>
-										{$event.follows}
-									</li>
-								</ul>
-							</a>
-						</li>
-					{/foreach}
-					{foreach from=$events.past.events item=event}
-						<li style="display: none;">
-							<a class="past" href="#{$event.id}" data-event-id="{$event.id}" data-status="{$event.status}" data-category="{$event.category}">
+							<a class="event upcoming" href="#" data-event-id="{$event.id}">
 								<div class="time">
 									<span class="icon clock"></span>
 									{$event.date}, {$event.time}
@@ -152,9 +130,15 @@
 						</li>
 					{/foreach}
 					</ul>
-					<a class="write-us active" href="sms:+16159727914;?&body=Hey%20Fig%21%20I%27m%20interested%20in%20...">
+					<a class="write-us mobile" href="sms:+16159727914;?&body=Hey%20Fig%21%20I%27m%20interested%20in%20...">
 						<div class="title">Interested in something else? Ask Fig!</div>
 					</a>
+					<a class="write-us desktop" href="mailto:chbarlow@gmail.com?subject=Hey%20Fig!%20I'm%20interested%20in%20">
+						<div class="title">Interested in something else? Ask Fig!</div>
+					</a>
+					<div class="empty">
+						<p>No events</p>
+					</div>
 				</div>
 			</div>
 			<div id="info" class="screen" data-event-id="0">
@@ -237,7 +221,7 @@
 			<div id="underconstruction" class="screen">
 				<div class="wrapper">
 					<div class="logo">
-						<img src="/img/logo_t.png"/>
+						<img src="/img/logo.png"/>
 					</div>
 					<div class="text">
 						<p>We're sorry!</p>
@@ -251,6 +235,7 @@
 
 	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLaZUH8a4A3iBtsgkLslF3NAuk-CvLkKI"></script>
 	<script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="/js/is_mobile.min.js"></script>
 	<script type="text/javascript" src="/js/main_old.js"></script>
 </body>
 </html>

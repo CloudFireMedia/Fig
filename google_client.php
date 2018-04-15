@@ -22,6 +22,10 @@ if (isset($_GET['code'])) {
 
 $expired = new DateTime();
 $c_time = new DateTime();
+$g_time = new DateTime('1899-12-30 00:00:00+00:00');
+$u_time = new DateTime('1970-01-01 00:00:00+00:00');
+
+$g_time->diff($u_time);
 
 if (isset($_SESSION['token'])) {
 	$expired->setTimestamp($_SESSION['token']['created'] + $_SESSION['token']['expires_in']);
@@ -31,7 +35,8 @@ if ($c_time < $expired) {
 	$google_client->setAccessToken($_SESSION['token']);
 } else {
 	$authUrl = $google_client->createAuthUrl();
-	echo('<a href='.$authUrl.'>Connect to google spreadsheets!</a>');
+
+	header('Location: '.$authUrl);
 	exit;
 }
 
