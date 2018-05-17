@@ -1,47 +1,44 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 require_once($_SERVER['DOCUMENT_ROOT'].'/google_client.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/interests.php');
 
 if (isset($_GET['action'])) {
-	$gss = new Google_Service_Sheets($google_client);
-	$spreadsheet_id = '1FEjVqDZwES6G10GnmuhWntNF7Y45jqVZMHuthf4n36U';
-	$range = 'Events!A2:J';
+	$range = $events_table.'!A2:J';
 	$options = array('valueRenderOption' => 'UNFORMATTED_VALUE');
 	$rows = $gss->spreadsheets_values->get($spreadsheet_id, $range, $options);
+	$result = array(
+		'success' => false,
+		'data' => ''
+	);
 
 	switch ($_GET['action']) {
 		case 'get':
 			$event = array();
 
-			$g_time = new DateTime('1899-12-30 00:00:00+00:00');
-			$u_time = new DateTime('1970-01-01 00:00:00+00:00');
-
-			$g_time->diff($u_time);
-
 			foreach ($rows['values'] as $row) {
 				if ($row[0] == $_GET['id']) {
-					$e_time = new DateTime('1970-01-01 00:00:00+00:00');
-					$e_time->setTimestamp(intval($row[5]*60*60*24) + intval($g_time->format('U')));
+					$e_time = new DateTime();
+					$e_time->setTimestamp(intval($row[5]*60*60*24) - $g_time_diff);
 
 					$status = trim(strtolower($row[3]));
 					$is_past = ($c_time >= $e_time);
 					$category = trim(strtolower($row[2]));
-					$event_follows = empty($row[4]) ? 0 : (int)$row[4];
+					$event_follows = empty($row[4]) ? 0 : intval($row[4]);
 
 					$c_time->setTime(0, 0, 0);
 					$date_diff = $c_time->diff($e_time);
 					$date_name = '';
 
-					switch ($date_diff->d) {
-						case 0:
-							$date_name = 'Today at';
-							break;
-						case 1:
-							$date_name = 'Tomorrow at';
-							break;
+					if ($date_diff->invert == 0) {
+						switch ($date_diff->days) {
+							case 0:
+								$date_name = 'Today at';
+								break;
+							case 1:
+								$date_name = 'Tomorrow at';
+								break;
+						}
 					}
 
 					$event = array(
@@ -52,23 +49,22 @@ if (isset($_GET['action'])) {
 						'is_past' => $is_past,
 						'follows' => $event_follows,
 						'fulldate' => $e_time,
-						'date' => ($date_name != '') ? $date_name : $e_time->format('l, F d'),
-						'time' => $e_time->format('h:ia'),
+						'date' => ($date_name != '') ? $date_name : $e_time->format('l, F j'),
+						'time' => (intval($e_time->format('i')) > 0) ? $e_time->format('g:ia') : $e_time->format('ga'),
 						'address' => $row[6]
 					);
 
+					$result['success'] = true;
+					$result['data'] = $event;
+
 					header('Content-Type: application/json');
-					echo(json_encode($event));
+					echo(json_encode($result));
 					exit;
 				}
 			}
 			break;
 		case 'set':
 			if (isset($_GET['fields'])) {
-				$result = array(
-					'success' => false,
-					'info' => ''
-				);
 				$fields = array(
 					'name' => 'H',
 					'status' => 'D',
@@ -79,22 +75,37 @@ if (isset($_GET['action'])) {
 					'category' => 'C'
 				);
 				$row_id = 2;
+				$range = $events_table.'!';
 
 				foreach ($rows['values'] as $row) {
 					if ($row[0] == $_GET['id']) {
+						$field_id = 1;
+						$event_values = array();
+
 						foreach ($_GET['fields'] as $name => $value) {
 							$col_id = $fields[$name];
 							$cell_name = $col_id.$row_id;
-							$range = 'Events!'.$cell_name.':'.$cell_name;
-							$values = array([
-								ucfirst($value)
-							]);
-							$body = new Google_Service_Sheets_ValueRange(['values' => $values]);
-							$options = array('valueInputOption' => 'RAW');
-							$results = $gss->spreadsheets_values->update($spreadsheet_id, $range, $body, $options);
-							$result['success'] = true;
-							$result['info'] += $results->getUpdatedCells();
+
+							if ($field_id == 1) {
+								$range .= $cell_name;
+							}
+
+							array_push($event_values, ucfirst($value));
+
+							$field_id++;
 						}
+
+						$range .= ':'.$cell_name;
+
+						recalculateInterests();
+
+						$body = new Google_Service_Sheets_ValueRange([
+							'values' => array($event_values)
+						]);
+						$options = array('valueInputOption' => 'RAW');
+						$results = $gss->spreadsheets_values->update($spreadsheet_id, $range, $body, $options);
+						$result['success'] = true;
+						$result['data'] += $results->getUpdatedCells();
 
 						header('Content-Type: application/json');
 						echo(json_encode($result));
@@ -111,9 +122,9 @@ if (isset($_GET['action'])) {
 			foreach ($rows['values'] as $row) {
 				$status = trim(strtolower($row[3]));
 				$category = trim(strtolower($row[2]));
-				$event_follows = empty($row[4]) ? 0 : (int)$row[4];
-				$e_time = new DateTime('1970-01-01 00:00:00+00:00');
-				$e_time->setTimestamp(intval($row[5]*60*60*24) + intval($g_time->format('U')));
+				$event_follows = empty($row[4]) ? 0 : intval($row[4]);
+				$e_time = new DateTime();
+				$e_time->setTimestamp(intval($row[5]*60*60*24) - $g_time_diff);
 
 				$event = array(
 					'id' => $row[0],
@@ -122,7 +133,7 @@ if (isset($_GET['action'])) {
 					'status' => $status,
 					'follows' => $event_follows,
 					'fulldate' => $e_time,
-					'date' => $e_time->format('l, F d'),
+					'date' => $e_time->format('l, F j'),
 					'time' => $e_time->format('h:i A'),
 					'address' => $row[6]
 				);
@@ -149,7 +160,9 @@ if (isset($_GET['action'])) {
 							break;
 					}
 				} elseif (isset($_GET['category']) && ($category == $_GET['category'])) {
-					array_push($events, $event);
+					if ($c_time < $e_time) {
+						array_push($events, $event);
+					}
 				}
 			}
 
@@ -157,8 +170,11 @@ if (isset($_GET['action'])) {
 				return ($a['fulldate'] > $b['fulldate']);
 			});*/
 
+			$result['success'] = true;
+			$result['data'] = $events;
+
 			header('Content-Type: application/json');
-			echo(json_encode($events));
+			echo(json_encode($result));
 			exit;
 
 			break;

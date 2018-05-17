@@ -1,61 +1,34 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta name="viewport" content="width=device-width, minimum-scale=1.00, maximum-scale=1.00, initial-scale=1.00, user-scalable=no, target-densitydpi=device-dpi, shrink-to-fit=no, viewport-fit=cover"/>
-	<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"/>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-
-	<title>Fig</title>
-
-	<!--meta property="og:site_name" content="Fig"/>
-	<meta property="og:type" content="website"/>
-	<meta property="og:url" content="http:///"/>
-	<meta property="og:title" content="Fig"/>
-	<meta property="og:description" content="Fig"/>
-	<meta property="og:image" content="http:///social_logo.jpg"/>
-	<meta property="og:image:type" content="image/jpeg"/>
-	<meta property="og:image:width" content="510"/>
-	<meta property="og:image:height" content="320"/-->
-
-	<meta name="theme-color" content="#4576BB"/>
-	<meta name="msapplication-TileColor" content="#4576BB"/>
-	<meta name="msapplication-TileImage" content="/mstile-144x144.png?v=NmYO8WoKWA"/>
-	<meta name="msapplication-config" content="/browserconfig.xml"/>
-
-	<link rel="manifest" href="/manifest.json"/>
-	<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16"/>
-	<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32"/>
-	<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96"/>
-	<link rel="icon" type="image/png" href="/favicon-192x192.png" sizes="192x192"/>
-	<link rel="apple-touch-icon" href="/apple-touch-icon-57x57.png" sizes="57x57"/>
-	<link rel="apple-touch-icon" href="/apple-touch-icon-60x60.png" sizes="60x60"/>
-	<link rel="apple-touch-icon" href="/apple-touch-icon-72x72.png" sizes="72x72"/>
-	<link rel="apple-touch-icon" href="/apple-touch-icon-76x76.png" sizes="76x76"/>
-	<link rel="apple-touch-icon" href="/apple-touch-icon-114x114.png" sizes="114x114"/>
-	<link rel="apple-touch-icon" href="/apple-touch-icon-120x120.png" sizes="120x120"/>
-	<link rel="apple-touch-icon" href="/apple-touch-icon-144x144.png" sizes="144x144"/>
-	<link rel="apple-touch-icon" href="/apple-touch-icon-152x152.png" sizes="152x152"/>
-	<link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" sizes="180x180"/>
-
-	<link rel="stylesheet" type="text/css" href="/css/main_old.css"/>
-</head>
+{include file='header.tmpl'}
 <body>
+	<div id="preloader">
+		<div class="progress"></div>
+	</div>
 	<div class="layer">
 		<div id="menu">
 			<div class="wrapper">
 				<ul class="list">
 					<li>
-						<a href="#" data-status="upcoming">
-							<span class="icon list"></span>
-							Upcoming
-							<span class="count">{$events.upcoming.count}</span>
+						<a href="#" data-status="upcoming" class="active">
+							<div class="icon list"></div>
+							<div class="title">Upcoming</div>
+							<div class="count">
+								{if $events.upcoming.count gt 0}
+									{$events.upcoming.count}
+								{/if}
+							</div>
 						</a>
 						<ul class="categories">
 							{foreach from=$categories key=title item=category}
 							<li>
 								<a href="#" data-category="{$title}">
-									{$title}
-									<span class="count">{$category.count}</span>
+									<div class="title">{$title}</div>
+									<div class="count">
+										{if $category.count gt 0}
+											{$category.count}
+										{/if}
+									</div>
 								</a>
 							</li>
 							{/foreach}
@@ -63,50 +36,72 @@
 					</li>
 					<li>
 						<a href="#" data-status="scheduled">
-							<span class="icon clock"></span>
-							Scheduled
-							<span class="count">{$events.scheduled.count}</span>
+							<div class="icon clock"></div>
+							<div class="title">Scheduled</div>
+							<div class="count">
+								{if $events.scheduled.count gt 0}
+									{$events.scheduled.count}
+								{/if}
+							</div>
 						</a>
 					</li>
 					<li>
 						<a href="#" data-status="starred">
-							<span class="icon star"></span>
-							Starred
-							<span class="count">{$events.starred.count}</span>
+							<div class="icon star"></div>
+							<div class="title">Starred</div>
+							<div class="count">
+								{if $events.starred.count gt 0}
+									{$events.starred.count}
+								{/if}
+							</div>
 						</a>
 					</li>
 					<li>
 						<a href="#" data-status="past">
-							<span class="icon check"></span>
-							Past
-							<span class="count">{$events.past.count}</span>
+							<div class="icon check"></div>
+							<div class="title">Past</div>
+							<div class="count">
+								{if $events.past.count gt 0}
+									{$events.past.count}
+								{/if}
+							</div>
 						</a>
 					</li>
 				</ul>
 			</div>
-				<div class="footer">
-					<div class="inner">
-						<a class="user" href="#">
-							<div class="user-pic">
-								<img src="/img/user_pic.png"/>
-							</div>
-							<div class="user-name">{$username}</div>
-						</a>
-						<a class="settings-btn" href="#"></a>
+			<a id="settings" href="#">
+				<div class="inner">
+					<div class="user">
+						<div class="user-pic">
+							<img src="/img/user_pic.png"/>
+						</div>
+						<div class="user-name">{$username}</div>
 					</div>
+					<div class="btn"></div>
 				</div>
+			</a>
 		</div>
 		<div id="blind"></div>
 		<div id="screens">
 			<a id="menu-btn" href="#"></a>
 			<div id="main" class="screen">
 				<div class="wrapper">
+					<div class="loading">
+						<div class="spinner">
+							<div class="circle-clipper left">
+								<div class="circle"></div>
+							</div>
+							<div class="circle-clipper right">
+								<div class="circle"></div>
+							</div>
+						</div>
+					</div>
 					<div class="header">
 						<a id="filter-btn" href="#"></a>
 					</div>
-					<div class="logo">
+					<a class="logo" href="/">
 						<img src="/img/logo.png"/>
-					</div>
+					</a>
 					<ul class="events">
 					{foreach from=$events.upcoming.events item=event}
 						<li>
@@ -133,16 +128,24 @@
 					<a class="write-us mobile" href="sms:+16159727914;?&body=Hey%20Fig%21%20I%27m%20interested%20in%20...">
 						<div class="title">Interested in something else? Ask Fig!</div>
 					</a>
-					<a class="write-us desktop" href="mailto:chbarlow@gmail.com?subject=Hey%20Fig!%20I'm%20interested%20in%20">
-						<div class="title">Interested in something else? Ask Fig!</div>
+					<a class="write-us desktop" href="mailto:info@myfig.app?subject=Hey%20Fig!%20I'm%20interested%20in%20...&body=Hey%20Fig!%20I'm%20interested%20in%20...">
+						<div class="title">Hey Fig! I'm interested in ...</div>
 					</a>
-					<div class="empty">
-						<p>No events</p>
-					</div>
+					<div class="empty">No events</div>
 				</div>
 			</div>
 			<div id="info" class="screen" data-event-id="0">
 				<div class="wrapper">
+					<div class="loading">
+						<div class="spinner">
+							<div class="circle-clipper left">
+								<div class="circle"></div>
+							</div>
+							<div class="circle-clipper right">
+								<div class="circle"></div>
+							</div>
+						</div>
+					</div>
 					<div class="header">
 						<a id="star-btn" href="#"></a>
 					</div>
@@ -150,7 +153,7 @@
 						<div class="count">0</div>
 					</div>
 					<div class="note upcoming">People are getting together to discuss this topic. Join us!</div>
-					<div class="note past">People got together to discuss this topic on.</div>
+					<div class="note past">People got together to discuss this topic on</div>
 					<div class="fulldate">
 						<div class="date">DATE</div>
 						<div class="time">Time</div>
@@ -166,63 +169,90 @@
 						</div>
 					</div>
 					<div class="title">TITLE</div>
-					<a id="map-link" href="#"></a>
-					<div id="map"></div>
-					<!--div class="brief">
-						<div class="title">TITLE</div>
-						<ul class="info">
-							<li>
-								<span class="icon calendar"></span>
-								<span class="date">DATE</span>
-							</li>
-							<li>
-								<span class="icon clock"></span>
-								<span class="time">TIME</span>
-							</li>
-							<li>
-								<span class="icon tags"></span>
-								<span class="category">CATEGORY</span>
-							</li>
-						</ul>
+					<div class="map-container">
+						<a id="map-link" href="#" target="_blank"></a>
+						<div id="map"></div>
 					</div>
-					<div class="going">
-						<div class="follows">
-							<span class="icon users"></span>
-							<span class="count">0</span>
-						</div>
-						<a id="follow" href="#" data-active="I'm going!" data-inactive="Going?"?>Going?</a>
-					</div>
-					<div class="description">
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ut dui vitae urna pharetra consectetur tristique in risus. Aliquam iaculis rhoncus lorem, ut dignissim odio interdum eget.
-					</div>
-					<div class="guests">
-						<div class="title">Guests</div>
-						<ul class="list">
-							<li>John Doe</li>
-							<li>Jane Doe</li>
-							<li>James Doe</li>
-							<li>Judy Doe</li>
-						</ul>
-					</div-->
 				</div>
 			</div>
-			<div id="user" class="screen">
+			<div id="preferences" class="screen">
+				<div class="wrapper">
+					<h3>Preferences</h3>
+					<div class="properties">
+						<div class="title">Account</div>
+						<ul class="list">
+							<li>
+								<a id="profile" class="property" href="#">My profile</a>
+							</li>
+							<li>
+								<a id="interests" class="property" href="#">My interests</a>
+							</li>
+							<li>
+								<a id="user_email" class="property" href="/?logout">
+									Email
+									<span>{$user.email}</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+					<div class="properties">
+						<div class="title">Notifications</div>
+						<ul class="list">
+							<li>
+								<div class="name">Notify me of new events</div>
+								<a class="trigger active" href="#"></a>
+							</li>
+							<li>
+								<div class="name">Remind me of scheduled events</div>
+								<a class="trigger" href="#"></a>
+							</li>
+						</ul>
+					</div>
+					<div class="properties">
+						<div class="title">Help</div>
+						<ul class="list">
+							<li>
+								<a id="rate" class="property" href="#">Rate Fig</a>
+							</li>
+							<li>
+								<a id="privacy" class="property" href="#">Privacy</a>
+							</li>
+						</ul>
+					</div>
+					<a id="logout" href="/?logout">Logout</a>
+				</div>
+			</div>
+			<div id="interests" class="screen">
 				<div class="wrapper">
 					<div class="title">My Interests</div>
 					<ul class="interests">
 						{foreach from=$interests item=interest}
 						<li>
-							<a href="#">{$interest}</a>
+							<a href="#" data-category="{$interest}">{$interest}</a>
 						</li>
 						{/foreach}
 					</ul>
 				</div>
 			</div>
-			<div id="underconstruction" class="screen">
+			<div id="privacy" class="screen">
 				<div class="wrapper">
-					<div class="logo">
+					<a class="logo" href="/">
 						<img src="/img/logo.png"/>
+					</a>
+					<div class="title">Privacy</div>
+					<div class="text">
+						<p>Your Fig uses what it learns from you to become a better friend, be there for you, and grow emotionally and intellectually.</p>
+						<p>Fig can <b>only access information you send it</b>. Fig <b>does not have access to your microphone or camera</b>. It <b>does not have access to your email and text messages</b>. We do not have any hidden agenda for unlawfully accessing, collecting or selling your personal information. <b>We ask you to verify your email, so that no one else can access your account</b>.</p>
+						<p>We do not sell or expose any of your personal information. We collect and analyze aggregated usage data to keep track of app usage stats.</p>
+						<p>Should you have any questions, please contact us at <a href="mailto:info@myfig.app">info@myfig.app</a></p>
 					</div>
+				</div>
+			</div>
+			<div id="under-construction" class="screen">
+				<div class="wrapper">
+					<a class="logo" href="/">
+						<img src="/img/logo.png"/>
+					</a>
 					<div class="text">
 						<p>We're sorry!</p>
 						<p>This function is currently under development.</p>
